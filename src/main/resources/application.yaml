@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: rent_management
+
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/rentmanagement
+
