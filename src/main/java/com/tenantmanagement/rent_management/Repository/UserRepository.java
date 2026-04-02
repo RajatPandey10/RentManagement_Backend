@@ -9,4 +9,8 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User,String> {
     //    public Boolean MobileNumber(String number);
     public boolean existsByMobileNumber(String mobileNumber);
+
+    public boolean existsByEmail(String email);
+
+    public  Optional<User> findByEmail(String email);
 }

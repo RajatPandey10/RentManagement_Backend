@@ -35,7 +35,7 @@ public class User {
         USER,ADMIN
     }
 
-    private float electricityRatePerUnt;
+    private double electricityRatePerUnt;
 
     @CreatedDate
     private LocalDateTime createdAt;

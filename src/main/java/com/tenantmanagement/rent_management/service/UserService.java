@@ -1,11 +1,18 @@
 package com.tenantmanagement.rent_management.service;
 
+import com.tenantmanagement.rent_management.DTO.LoginRequest;
 import com.tenantmanagement.rent_management.DTO.RegisterRequest;
 import com.tenantmanagement.rent_management.DTO.UserResponse;
 import com.tenantmanagement.rent_management.Document.User;
 import com.tenantmanagement.rent_management.Repository.UserRepository;
+import com.tenantmanagement.rent_management.exception.InvalidCredentialsException;
+import com.tenantmanagement.rent_management.exception.ResourceExistsException;
+import com.tenantmanagement.rent_management.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +40,28 @@ public class UserService {
 
     public UserResponse createUser(RegisterRequest request){
         if(userRepository.existsByMobileNumber(request.getMobileNumber())){
-            throw new RuntimeException("Phone no is already exists");
+            throw new ResourceExistsException("Phone no is already exists");
         }
-
         User newUser = toDocument(request);
         userRepository.save(newUser);
 
         return toResponse(newUser);
     }
 
+    public List<User> getAllUser(){
+        return userRepository.findAll();
 
+    }
+
+    public UserResponse login(LoginRequest request){
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(()->  new ResourceNotFoundException("Email is invalid"));
+
+        if(!user.getPassword().equals(request.getPassword())){
+            throw new InvalidCredentialsException("Invalid password");
+        }
+
+        return toResponse(user);
+    }
 
 }
