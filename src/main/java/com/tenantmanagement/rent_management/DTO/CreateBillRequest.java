@@ -16,6 +16,6 @@ public class CreateBillRequest {
     private int currentReading;
 
     private double ratePerUnit;
-    private LocalDateTime dueDate;
+//    private LocalDateTime dueDate;
 
 }
