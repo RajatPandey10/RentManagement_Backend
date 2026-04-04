@@ -34,17 +34,9 @@ public class AuthController {
 
     @GetMapping()
     public ResponseEntity<?> getALlUsers(){
-        try{
-            List<User> users = userService.getAllUser();
-            return ResponseEntity.ok(users);
-        }catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
-
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
     }
+
 }
 
 
