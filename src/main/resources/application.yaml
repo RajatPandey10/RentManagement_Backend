@@ -7,3 +7,8 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/rentmanagement
 
+# Razorpay Configuration
+razorpay:
+  key:
+    id: ${RAZORPAY_ID}
+    secret: ${RAZORPAY_SECRET}

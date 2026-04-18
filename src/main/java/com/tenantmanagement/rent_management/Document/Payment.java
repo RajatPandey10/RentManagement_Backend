@@ -23,10 +23,22 @@ public class Payment {
     private String userId;
     private String billId;
 
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String razorpaySignature;
+
+    private String currency;
+
+    private Double amount;
+
+
+
     private PaymentMode paymentMode;
     public enum PaymentMode{
         UPI,CASH
     }
+
+    private String receipt;
 
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
@@ -42,5 +54,7 @@ public class Payment {
     private Boolean verifiedByAdmin = false;
 
     private LocalDateTime verifiedAt;
+
+
 
 }

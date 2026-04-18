@@ -27,6 +27,7 @@ public class BillService {
     public List<BillResponse> toResponse(String userId){
         List<Bill> bills = billRepository.findByUserId(userId);
         return bills.stream().map((bill)-> BillResponse.builder()
+                .id(bill.getId())
                 .userId(userId)
                 .month(bill.getMonth())
                 .year(bill.getYear())
@@ -34,6 +35,7 @@ public class BillService {
                 .rentAmount(bill.getRentAmount())
                 .totalAmount(bill.getTotalAmount())
                 .electricityAmount(bill.getElectricityAmount())
+                .status(Bill.Status.UNPAID)
                 .build()
         ).toList();
 
@@ -58,20 +60,37 @@ public class BillService {
         User existingUser = userRepository.findById(request.getUserId())
                 .orElseThrow(()-> new  ResourceNotFoundException("User not found for userId "+request.getUserId()));
 
+        int units = request.getCurrentReading() - request.getPreviousReading();
+        double electricity = units * request.getRatePerUnit();
+        double total = electricity + request.getRentAmount();
+
         Bill newBill = Bill.builder()
                 .month(request.getMonth())
                 .userId(request.getUserId())
                 .year(request.getYear())
+
+                // RENT + ELECTRICITY
                 .rentAmount(request.getRentAmount())
                 .currentReading(request.getCurrentReading())
                 .previousReading(request.getPreviousReading())
-                .electricityAmount(electricityAmount(request))
-                .totalAmount(totalAmount(request))
-                .penaltyRemovedByAdmin(false)
+                .unitsConsumed(units)
                 .ratePerUnit(request.getRatePerUnit())
+                .electricityAmount(electricity)
+
+                // TOTAL
+                .totalAmount(total)
                 .penaltyAmount(0)
                 .discountAmount(0)
+
+                // PAYMENT TRACKING (CRITICAL)
+                .paidAmount(0)
+                .remainingAmount(total)
+                .carryForwardAmount(0)
+
+                // STATUS
                 .status(Bill.Status.UNPAID)
+
+                .penaltyRemovedByAdmin(false)
                 .dueDate(LocalDateTime.now().plusDays(10))
                 .build();
         billRepository.save(newBill);

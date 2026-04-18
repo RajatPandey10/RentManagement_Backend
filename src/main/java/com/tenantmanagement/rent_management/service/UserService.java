@@ -26,6 +26,7 @@ public class UserService {
                 .mobileNumber(newUser.getMobileNumber())
                 .name(newUser.getName())
                 .role(newUser.getRole())
+                .id(newUser.getId())
                 .build();
     }
 
