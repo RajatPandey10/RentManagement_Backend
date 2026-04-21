@@ -7,6 +7,9 @@ import com.razorpay.Utils;
 import com.tenantmanagement.rent_management.Document.Bill;
 import com.tenantmanagement.rent_management.Document.Payment;
 import com.tenantmanagement.rent_management.Document.User;
+import com.tenantmanagement.rent_management.Enums.BillStatus;
+import com.tenantmanagement.rent_management.Enums.PaymentMode;
+import com.tenantmanagement.rent_management.Enums.PaymentStatus;
 import com.tenantmanagement.rent_management.Repository.BillRepository;
 import com.tenantmanagement.rent_management.Repository.PaymentRepository;
 import com.tenantmanagement.rent_management.Repository.UserRepository;
@@ -17,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 
@@ -61,8 +65,8 @@ public class PaymentService {
                 .billId(billId)
                 .amount(amount)
                 .currency("INR")
-                .paymentMode(Payment.PaymentMode.UPI)
-                .paymentStatus(Payment.PaymentStatus.PENDING)
+                .paymentMode(PaymentMode.UPI)
+                .paymentStatus(PaymentStatus.PENDING)
                 .razorpayOrderId(order.get("id"))
 
                 .build();
@@ -89,7 +93,7 @@ public class PaymentService {
                 payment.setRazorpayPaymentId(razorpayPaymentId);
                 payment.setRazorpaySignature(razorpaySignature);
 
-                payment.setPaymentMode(Payment.PaymentMode.UPI);
+                payment.setPaymentMode(PaymentMode.UPI);
                 payment.setPaidAt(LocalDateTime.now());
                 Payment paidPayment = paymentRepository.save(payment);
 
@@ -115,8 +119,8 @@ public class PaymentService {
                 .billId(billId)
                 .amount(amount)
                 .currency("INR")
-                .paymentMode(Payment.PaymentMode.CASH)
-                .paymentStatus(Payment.PaymentStatus.PENDING_VERIFICATION)
+                .paymentMode(PaymentMode.CASH)
+                .paymentStatus(PaymentStatus.PENDING_VERIFICATION)
                 .build();
 
         return paymentRepository.save(payment);
@@ -127,7 +131,7 @@ public class PaymentService {
                 .orElseThrow(()-> new ResourceNotFoundException("Payment Id is invalid"));
 
         payment.setVerifiedByAdmin(true);
-        payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
+        payment.setPaymentStatus(PaymentStatus.SUCCESS);
         payment.setVerifiedAt(LocalDateTime.now());
 
         paymentRepository.save(payment);
@@ -147,9 +151,9 @@ public class PaymentService {
         bill.setRemainingAmount(remaining);
 
         if(remaining==0){
-            bill.setStatus(Bill.Status.PAID);
+            bill.setStatus(BillStatus.PAID);
         }else {
-            bill.setStatus(Bill.Status.PARTIAL);
+            bill.setStatus(BillStatus.PARTIAL);
         }
 
         billRepository.save(bill);

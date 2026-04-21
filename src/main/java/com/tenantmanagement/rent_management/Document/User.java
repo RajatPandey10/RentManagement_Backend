@@ -1,5 +1,6 @@
 package com.tenantmanagement.rent_management.Document;
 
+import com.tenantmanagement.rent_management.Enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,9 +32,7 @@ public class User {
 
     private Role role = Role.USER;
 
-    public enum Role{
-        USER,ADMIN
-    }
+
 
     private double electricityRatePerUnt;
 

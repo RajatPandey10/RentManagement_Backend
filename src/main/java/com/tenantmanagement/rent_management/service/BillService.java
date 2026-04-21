@@ -4,10 +4,14 @@ import com.tenantmanagement.rent_management.DTO.BillResponse;
 import com.tenantmanagement.rent_management.DTO.CreateBillRequest;
 import com.tenantmanagement.rent_management.Document.Bill;
 import com.tenantmanagement.rent_management.Document.User;
+import com.tenantmanagement.rent_management.Enums.BillStatus;
 import com.tenantmanagement.rent_management.Repository.BillRepository;
 import com.tenantmanagement.rent_management.Repository.UserRepository;
 import com.tenantmanagement.rent_management.exception.ResourceNotFoundException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BillService {
 
     private final UserRepository userRepository;
@@ -35,7 +40,7 @@ public class BillService {
                 .rentAmount(bill.getRentAmount())
                 .totalAmount(bill.getTotalAmount())
                 .electricityAmount(bill.getElectricityAmount())
-                .status(Bill.Status.UNPAID)
+                .status(BillStatus.UNPAID)
                 .build()
         ).toList();
 
@@ -88,7 +93,7 @@ public class BillService {
                 .carryForwardAmount(0)
 
                 // STATUS
-                .status(Bill.Status.UNPAID)
+                .status(BillStatus.UNPAID)
 
                 .penaltyRemovedByAdmin(false)
                 .dueDate(LocalDateTime.now().plusDays(10))
@@ -100,6 +105,13 @@ public class BillService {
 
     }
 
+    @Value("${spring.data.mongodb.uri}")
+    private String uri;
+
+    @PostConstruct
+    public void printUri() {
+        System.out.println("MONGO URI = " + uri);
+    }
 
 
 }

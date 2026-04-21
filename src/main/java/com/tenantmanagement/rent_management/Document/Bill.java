@@ -2,6 +2,7 @@ package com.tenantmanagement.rent_management.Document;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tenantmanagement.rent_management.Enums.BillStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,14 +49,8 @@ public class Bill {
     private double carryForwardAmount;
 
     // STATUS
-    private Status status;
+    private BillStatus status;
 
-    public enum Status {
-        PAID,
-        PARTIAL,
-        UNPAID,
-        PENDING_VERIFICATION
-    }
 
     // FLAGS
     private boolean penaltyRemovedByAdmin;

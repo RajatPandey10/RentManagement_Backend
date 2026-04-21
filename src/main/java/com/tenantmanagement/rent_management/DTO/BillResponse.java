@@ -1,6 +1,7 @@
 package com.tenantmanagement.rent_management.DTO;
 
 import com.tenantmanagement.rent_management.Document.Bill;
+import com.tenantmanagement.rent_management.Enums.BillStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class BillResponse {
 
     private double totalAmount;
 
-    private Bill.Status status;
+    private BillStatus status;
 
 
 }

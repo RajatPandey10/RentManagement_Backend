@@ -4,6 +4,7 @@ import com.tenantmanagement.rent_management.DTO.LoginRequest;
 import com.tenantmanagement.rent_management.DTO.RegisterRequest;
 import com.tenantmanagement.rent_management.DTO.UserResponse;
 import com.tenantmanagement.rent_management.Document.User;
+import com.tenantmanagement.rent_management.Enums.Role;
 import com.tenantmanagement.rent_management.Repository.UserRepository;
 import com.tenantmanagement.rent_management.exception.InvalidCredentialsException;
 import com.tenantmanagement.rent_management.exception.ResourceExistsException;
@@ -35,7 +36,7 @@ public class UserService {
                 .email(request.getEmail())
                 .name(request.getName())
                 .mobileNumber(request.getMobileNumber())
-                .role(User.Role.USER)
+                .role(Role.USER)
                 .password(request.getPassword())
                 .build();
     }

@@ -1,6 +1,8 @@
 package com.tenantmanagement.rent_management.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tenantmanagement.rent_management.Enums.PaymentMode;
+import com.tenantmanagement.rent_management.Enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,17 +36,13 @@ public class Payment {
 
 
     private PaymentMode paymentMode;
-    public enum PaymentMode{
-        UPI,CASH
-    }
+
 
     private String receipt;
 
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
-    public enum PaymentStatus{
-        PENDING,SUCCESS,FAILED,PENDING_VERIFICATION
-    }
+
 
     private String transactionId;
 

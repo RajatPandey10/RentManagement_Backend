@@ -80,7 +80,6 @@ public class PaymentController {
 
     @PostMapping("/createCashPayment/{userId}")
     public ResponseEntity<?> createCashPayment(@RequestBody CreatePaymentRequest request, @PathVariable String userId){
-        log.info("API is working");
 
         if(userId==null) {
             return ResponseEntity.badRequest().body("User not found");
@@ -108,6 +107,5 @@ public class PaymentController {
         paymentService.verifyCashPayment(paymentId);
         return ResponseEntity.status(HttpStatus.OK).body("Successfully varified");
     }
-
 
 }

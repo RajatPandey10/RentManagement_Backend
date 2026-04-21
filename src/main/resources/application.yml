@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: rent_management
+  data:
+    mongodb:
+      uri: mongodb+srv://rajatprofessionalwork100_db_user:Database%40123%23@cluster0.xbjfvys.mongodb.net/rentmanagement
+# Razorpay Configuration
+razorpay:
+  key:
+    id: ${RAZORPAY_ID}
+    secret: ${RAZORPAY_SECRET}
+
