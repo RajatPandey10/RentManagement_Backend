@@ -26,7 +26,7 @@ public class PaymentController {
 
 
     @PostMapping("/createPayment/{userId}")
-    public ResponseEntity<?> createUpiPayment(@RequestBody CreatePaymentRequest request, @PathVariable String userId) throws RazorpayException {
+    public ResponseEntity<?> createUpiPayment(@RequestBody CreatePaymentRequest request, @PathVariable Long userId) throws RazorpayException {
 
         if(userId==null) {
             return ResponseEntity.badRequest().body("User not found");
@@ -41,7 +41,7 @@ public class PaymentController {
                 "paymentId",payment.getRazorpayOrderId(),
                 "amount",payment.getAmount(),
                 "currency",payment.getCurrency(),
-                "receipt",payment.getBillId()
+                "receipt",payment.getBill().getId()
         );
 
 
@@ -79,7 +79,7 @@ public class PaymentController {
     }
 
     @PostMapping("/createCashPayment/{userId}")
-    public ResponseEntity<?> createCashPayment(@RequestBody CreatePaymentRequest request, @PathVariable String userId){
+    public ResponseEntity<?> createCashPayment(@RequestBody CreatePaymentRequest request, @PathVariable Long userId){
 
         if(userId==null) {
             return ResponseEntity.badRequest().body("User not found");
@@ -94,13 +94,13 @@ public class PaymentController {
         Map<String,Object> response = Map.of(
                 "amount",payment.getAmount(),
                 "currency",payment.getCurrency(),
-                "receipt",payment.getBillId()
+                "receipt",payment.getBill().getId()
         );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/verifyCashPayment/{paymentId}")
-    public ResponseEntity<?> verifyCashPayment(@PathVariable String paymentId){
+    public ResponseEntity<?> verifyCashPayment(@PathVariable Long paymentId){
         if(paymentId==null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed");
         }

@@ -7,6 +7,7 @@ import com.tenantmanagement.rent_management.Document.User;
 import com.tenantmanagement.rent_management.Enums.BillStatus;
 import com.tenantmanagement.rent_management.Repository.BillRepository;
 import com.tenantmanagement.rent_management.Repository.UserRepository;
+import com.tenantmanagement.rent_management.exception.BadRequestException;
 import com.tenantmanagement.rent_management.exception.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class BillService {
 
     private final BillRepository billRepository;
 
-    public List<BillResponse> toResponse(String userId){
+    public List<BillResponse> toResponse(Long userId){
         List<Bill> bills = billRepository.findByUserId(userId);
         return bills.stream().map((bill)-> BillResponse.builder()
                 .id(bill.getId())
@@ -54,7 +55,7 @@ public class BillService {
         return electricityAmount(request) + request.getRentAmount();
     }
 
-    public List<BillResponse> getBillByUserId(String userId){
+    public List<BillResponse> getBillByUserId(Long userId){
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found for userId "+userId));
 
@@ -69,9 +70,14 @@ public class BillService {
         double electricity = units * request.getRatePerUnit();
         double total = electricity + request.getRentAmount();
 
+        boolean exists = billRepository.existsByMonthAndYear(request.getMonth(), request.getYear());
+        if (exists) {
+            throw new BadRequestException("Bill already generated for this month and year");
+        }
+
         Bill newBill = Bill.builder()
                 .month(request.getMonth())
-                .userId(request.getUserId())
+                .user(existingUser)
                 .year(request.getYear())
 
                 // RENT + ELECTRICITY
@@ -105,13 +111,6 @@ public class BillService {
 
     }
 
-    @Value("${spring.data.mongodb.uri}")
-    private String uri;
-
-    @PostConstruct
-    public void printUri() {
-        System.out.println("MONGO URI = " + uri);
-    }
 
 
 }

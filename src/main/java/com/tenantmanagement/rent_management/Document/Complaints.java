@@ -2,13 +2,13 @@ package com.tenantmanagement.rent_management.Document;
 
 
 import com.tenantmanagement.rent_management.Enums.ComplaintStatus;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
 
 import java.time.LocalDateTime;
 
@@ -16,16 +16,21 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "complaints")
+@Entity
+@Table(name = "complaints")
 public class Complaints {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     private String title;
     private String description;
 
+    @Enumerated(EnumType.STRING)
     private ComplaintStatus status;
 
     @CreatedDate
@@ -33,5 +38,11 @@ public class Complaints {
 
 
     private LocalDateTime resolveAt;
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
 
 }

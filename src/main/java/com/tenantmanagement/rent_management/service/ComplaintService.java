@@ -21,14 +21,14 @@ public class ComplaintService {
 
 
 
-    public Complaints createComplaint(String userId, String title, String description){
+    public Complaints createComplaint(Long userId, String title, String description){
         User existingUser = userRepository.findById(userId).
                 orElseThrow(()-> new ResourceNotFoundException("User not found for userId"+userId));
 
         Complaints complaint = Complaints.builder()
                 .title(title)
                 .description(description)
-                .userId(userId)
+                .user(existingUser)
                 .status(ComplaintStatus.OPEN)
                 .build();
 
@@ -44,7 +44,7 @@ public class ComplaintService {
     }
 
 
-    public Complaints updateThroughAdmin(String complaintId){
+    public Complaints updateThroughAdmin(Long complaintId){
         Complaints complaints = complaintRepository.findById(complaintId)
                 .orElseThrow(()-> new ResourceNotFoundException("Complaint does not found!!"));
 

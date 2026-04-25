@@ -1,45 +1,61 @@
 package com.tenantmanagement.rent_management.Document;
 
 import com.tenantmanagement.rent_management.Enums.Role;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Document(collection = "users")
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
+@Entity
+@Table(name = "users")
+
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String mobileNumber;
     private String name;
-    @Indexed(unique = true)
+    @Column(unique = true)
     private String email;
     private String password;
 
     private int rentAmount;
 
+    @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
 
 
     private double electricityRatePerUnt;
 
-    @CreatedDate
+
     private LocalDateTime createdAt;
+    @PostPersist
+    public void createAt(){
+        createdAt = LocalDateTime.now();
+    }
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<Bill> bills;
+
+    @OneToMany(mappedBy = "user")
+    private List<Complaints> complaints;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
 
 }

@@ -16,7 +16,7 @@ public class BillController {
     private final BillService billService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getBillByUserId(@PathVariable String userId ){
+    public ResponseEntity<?> getBillByUserId(@PathVariable Long userId ){
         return ResponseEntity.status(HttpStatus.OK).body(billService.getBillByUserId(userId));
     }
 

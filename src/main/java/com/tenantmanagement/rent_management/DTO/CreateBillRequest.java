@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class CreateBillRequest {
 
-    private String userId;
+    private Long userId;
     private int month;
     private int year;
 

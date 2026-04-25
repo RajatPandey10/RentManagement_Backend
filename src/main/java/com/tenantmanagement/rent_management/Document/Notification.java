@@ -3,13 +3,12 @@ package com.tenantmanagement.rent_management.Document;
 import com.tenantmanagement.rent_management.Enums.NotificationSentVia;
 import com.tenantmanagement.rent_management.Enums.NotificationStatus;
 import com.tenantmanagement.rent_management.Enums.NotificationType;
+import jakarta.persistence.*;
 import jdk.jshell.Snippet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
@@ -17,19 +16,33 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "notification")
+@Entity
+@Table(name = "notifications")
 public class Notification {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String message;
 
+    @Enumerated(EnumType.STRING)
     private NotificationType type;
 
+    @Enumerated(EnumType.STRING)
     private NotificationSentVia sentVia;
+
+    @Enumerated(EnumType.STRING)
     private NotificationStatus status;
+
     private LocalDateTime sentAt;
+
+    @PrePersist
+    public void onCreate() {
+        sentAt = LocalDateTime.now();
+    }
 }

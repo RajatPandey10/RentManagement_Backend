@@ -20,10 +20,10 @@ public class ComplaintController {
 
     @PostMapping("/createComplaint/{userId}")
     public ResponseEntity<?> createComplaint(@RequestBody ComplaintRequest request,
-                                             @PathVariable String userId){
+                                             @PathVariable Long userId){
         Complaints complaint = complaintService.createComplaint(userId, request.getTitle(), request.getDescription());
 
-        Map<String,String> response = Map.of(
+        Map<String,Object> response = Map.of(
                 "userId",userId,
                 "Title", complaint.getTitle(),
                 "Description", complaint.getDescription()
@@ -39,9 +39,9 @@ public class ComplaintController {
     }
 
     @PostMapping("/updateComplaints/{complaintId}")
-    public ResponseEntity<?> updateComplaint(@PathVariable String complaintId){
+    public ResponseEntity<?> updateComplaint(@PathVariable Long complaintId){
         Complaints complaints = complaintService.updateThroughAdmin(complaintId);
-        Map<String,String> response = Map.of(
+        Map<String,Object> response = Map.of(
                 "ComplaintId",complaintId,
                 "Status", String.valueOf(complaints.getStatus())
         );

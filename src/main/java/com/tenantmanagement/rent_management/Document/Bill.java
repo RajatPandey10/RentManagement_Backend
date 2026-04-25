@@ -1,29 +1,34 @@
 package com.tenantmanagement.rent_management.Document;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.tenantmanagement.rent_management.Enums.BillStatus;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+
+
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "bills")
+@Entity
+@Table(name="bills")
 public class Bill {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private int month;
     private int year;
@@ -49,6 +54,7 @@ public class Bill {
     private double carryForwardAmount;
 
     // STATUS
+    @Enumerated(EnumType.STRING)
     private BillStatus status;
 
 
@@ -57,6 +63,15 @@ public class Bill {
 
     private LocalDateTime dueDate;
 
-    @CreatedDate
+
     private LocalDateTime generatedAt;
+
+
+    @PrePersist
+    public void onCreate() {
+        generatedAt = LocalDateTime.now();
+    }
+
+    @OneToMany(mappedBy = "bill")
+    private List<Payment> payments;
 }

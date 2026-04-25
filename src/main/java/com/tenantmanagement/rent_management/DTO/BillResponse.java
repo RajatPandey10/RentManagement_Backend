@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 
 public class BillResponse {
 
-    private String id;
-    private String userId;
+    private Long id;
+    private Long userId;
     private int month;
     private int year;
 

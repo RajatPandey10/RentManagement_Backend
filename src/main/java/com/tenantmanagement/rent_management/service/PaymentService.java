@@ -6,19 +6,16 @@ import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
 import com.tenantmanagement.rent_management.Document.Bill;
 import com.tenantmanagement.rent_management.Document.Payment;
-import com.tenantmanagement.rent_management.Document.User;
 import com.tenantmanagement.rent_management.Enums.BillStatus;
 import com.tenantmanagement.rent_management.Enums.PaymentMode;
 import com.tenantmanagement.rent_management.Enums.PaymentStatus;
 import com.tenantmanagement.rent_management.Repository.BillRepository;
 import com.tenantmanagement.rent_management.Repository.PaymentRepository;
-import com.tenantmanagement.rent_management.Repository.UserRepository;
 import com.tenantmanagement.rent_management.exception.BadRequestException;
 import com.tenantmanagement.rent_management.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 
@@ -39,7 +36,7 @@ public class PaymentService {
 
 
 
-    public Payment createUpiPayment(String billId, Double amount) throws RazorpayException {
+    public Payment createUpiPayment(Long billId, Double amount) throws RazorpayException {
 
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(()-> new ResourceNotFoundException("Bill not found for billId "+billId));
@@ -56,13 +53,13 @@ public class PaymentService {
 
         request.put("amount",amountInPaise);
         request.put("currency","INR");
-        request.put("receipt",billId);
+        request.put("receipt",String.valueOf(billId));
 
         Order order = client.orders.create(request);
 
         Payment payment = Payment.builder()
-                .userId(bill.getUserId())
-                .billId(billId)
+                .user(bill.getUser())
+                .bill(bill)
                 .amount(amount)
                 .currency("INR")
                 .paymentMode(PaymentMode.UPI)
@@ -75,9 +72,11 @@ public class PaymentService {
 
     }
 
+
     public boolean verifyUpiPayment(String razorpayOrderId,
                                  String razorpayPaymentId,
                                  String razorpaySignature) throws RazorpayException{
+
 
         try{
             JSONObject attributes = new JSONObject();
@@ -97,7 +96,7 @@ public class PaymentService {
                 payment.setPaidAt(LocalDateTime.now());
                 Payment paidPayment = paymentRepository.save(payment);
 
-                updateBillAfterPayment(payment.getBillId(),paidPayment.getAmount());
+                updateBillAfterPayment(payment.getBill().getId(),paidPayment.getAmount());
                 return true;
             }
             return false;
@@ -109,14 +108,28 @@ public class PaymentService {
         }
     }
 
-    public Payment createCashPayment(String billId, Double amount){
+    public Payment createCashPayment(Long billId, Double amount){
 
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(()-> new ResourceNotFoundException("Bill not found for Bill Id: "+billId));
 
+
+        Double totalReserved = paymentRepository.getTotalActivePaymentsByBillId(billId);
+
+        double remaining = bill.getTotalAmount() - totalReserved;
+
+        if (remaining <= 0) {
+            throw new BadRequestException("Bill already fully paid");
+        }
+
+        if (amount > remaining) {
+            throw new BadRequestException("Amount exceeds remaining bill amount");
+        }
+
+
         Payment payment = Payment.builder()
-                .userId(bill.getUserId())
-                .billId(billId)
+                .user(bill.getUser())
+                .bill(bill)
                 .amount(amount)
                 .currency("INR")
                 .paymentMode(PaymentMode.CASH)
@@ -126,9 +139,28 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public void verifyCashPayment(String paymentId){
+    public void verifyCashPayment(Long paymentId){
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(()-> new ResourceNotFoundException("Payment Id is invalid"));
+
+        PaymentMode  mode = payment.getPaymentMode();
+
+        if(payment.getPaymentStatus() == PaymentStatus.SUCCESS){
+            throw new BadRequestException("Already Verified");
+        }
+
+        if(mode == PaymentMode.UPI){
+            throw  new BadRequestException("can't verified UPI pay method");
+        }
+        Bill bill = payment.getBill();
+
+        double remaining = bill.getRemainingAmount();
+
+        // 🔥 IMPORTANT CHECK
+        if(payment.getAmount() > remaining){
+            throw new BadRequestException("Verification exceeds remaining bill amount");
+        }
+
 
         payment.setVerifiedByAdmin(true);
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
@@ -136,10 +168,10 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-        updateBillAfterPayment(payment.getBillId(),payment.getAmount());
+        updateBillAfterPayment(payment.getBill().getId(),payment.getAmount());
     }
 
-    public void updateBillAfterPayment(String billId, Double amount) {
+    public void updateBillAfterPayment(Long billId, Double amount) {
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(()-> new ResourceNotFoundException("Bill not found"));
 
